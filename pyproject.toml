@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-devops-assistant"
+version = "2.0.0"
+description = "Air-gapped, open-source AI DevOps Assistant — CI/CD pipeline with 7 static scanners, AI code review, STRIDE threat modeling, auto-fix, live web dashboard, and CI/CD generator."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "AI DevOps Assistant Contributors" }]
+keywords = ["devops", "ci", "code-quality", "ai", "ollama", "security", "linting"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Security",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "gitpython>=3.1.40",
+    "ruff>=0.1.0",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "bandit>=1.7.5",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+    "typer[all]>=0.9.0",
+    "rich>=13.0.0",
+    "jinja2>=3.1.0",
+    "mypy>=1.0.0",
+    "pylint>=3.0.0",
+    "safety>=2.3.0",
+    "flask>=3.0.0",
+]
+
+[project.optional-dependencies]
+web = ["flask>=3.0.0"]
+all = [
+    "flask>=3.0.0",
+    "mypy>=1.0.0",
+    "pylint>=3.0.0",
+    "safety>=2.3.0",
+]
+
+[project.scripts]
+devops-assistant = "devops_assistant.main:app"
+
+[project.urls]
+Homepage = "https://github.com/your-org/ai-devops-assistant"
+Repository = "https://github.com/your-org/ai-devops-assistant"
+Issues = "https://github.com/your-org/ai-devops-assistant/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.devops-assistant.alerts]
+min_quality_score = 75
+max_violations = 10
+slack_webhook = ""
+email_to = ""
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true

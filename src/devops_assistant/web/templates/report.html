@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI Report — AI DevOps Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root { --bg:#0a0f1e; --surface:#111827; --card:#1a2236; --border:#2d3a52; --text:#e8eaf0; --muted:#8892a4; --green:#10b981; --red:#ef4444; --amber:#f59e0b; --blue:#3b82f6; --purple:#8b5cf6; --cyan:#06b6d4; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+        .nav-brand { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; font-size: 0.9rem; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        /* Header */
+        .report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .report-header h1 { font-size: 1.4rem; }
+        .report-meta { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; font-family: 'Fira Code', monospace; }
+        .badge { padding: 0.3rem 0.8rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; }
+        .badge-pass { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid var(--green); }
+        .badge-fail { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid var(--red); }
+        .badge-warn { background: rgba(245,158,11,0.15); color: var(--amber); border: 1px solid var(--amber); }
+        .badge-info { background: rgba(59,130,246,0.15); color: var(--blue); border: 1px solid var(--blue); }
+        
+        /* Metric Cards */
+        .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem 1.5rem; }
+        .metric-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 2rem; font-weight: 700; }
+        .metric-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+        
+        /* Sections */
+        .section { margin-bottom: 2rem; }
+        .section-header { font-size: 1.05rem; font-weight: 600; border-left: 3px solid var(--blue); padding-left: 0.7rem; margin-bottom: 1rem; }
+        
+        /* Table */
+        table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+        th { background: rgba(255,255,255,0.03); color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.7rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        td { padding: 0.7rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        code { font-family: 'Fira Code', monospace; background: rgba(255,255,255,0.08); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; }
+        a.file-link { color: var(--blue); text-decoration: none; font-weight: 500; }
+        a.file-link:hover { text-decoration: underline; }
+        
+        /* AI Review */
+        .review-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+        .review-summary { color: var(--muted); margin-bottom: 1rem; line-height: 1.6; }
+        .comment { border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem; }
+        .comment-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .comment p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+        pre { background: #060b14; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; font-family: 'Fira Code', monospace; font-size: 0.82rem; overflow-x: auto; color: #e2e8f0; margin-top: 0.5rem; }
+        
+        /* Threat Model */
+        .threat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem; }
+        .threat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.2rem; }
+        .threat-category { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--amber); font-weight: 700; margin-bottom: 0.4rem; }
+        .threat-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .threat-detail { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+        .threat-detail strong { color: var(--cyan); }
+
+        .empty-state { color: var(--muted); padding: 2rem; text-align: center; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="nav-brand">🤖 AI DevOps Assistant</span>
+        <div class="nav-links">
+            <a href="/">Dashboard</a>
+            <a href="/history">History</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="report-header">
+            <div>
+                <h1>📋 CI Report — <code>{{ report.run_id }}</code></h1>
+                <p class="report-meta">{{ report.timestamp }} | {{ report.target_path }} | Commit: {{ report.commit_info.commit_hash }} ({{ report.commit_info.branch }})</p>
+            </div>
+            <span class="badge {{ 'badge-pass' if report.overall_passed else 'badge-fail' }}">{{ 'PASSED' if report.overall_passed else 'FAILED' }}</span>
+        </div>
+
+        <!-- Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Quality Score</div>
+                <div class="metric-value" style="color:var(--blue)">{{ report.quality_score }}/100</div>
+                <div class="metric-sub">AI + linters + tests</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Violations</div>
+                <div class="metric-value" style="color:{{ 'var(--green)' if report.violations|length == 0 else 'var(--amber)' }}">{{ report.violations|length }}</div>
+                <div class="metric-sub">Ruff, Bandit, Semgrep, Mypy, Safety</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Tests</div>
+                <div class="metric-value" style="color:{{ 'var(--green)' if report.test_result.success else 'var(--red)' }}">{{ report.test_result.passed }}/{{ report.test_result.total_tests }}</div>
+                <div class="metric-sub">{{ report.test_result.coverage_percentage }}% coverage</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Docker</div>
+                <div class="metric-value" style="color:{{ 'var(--green)' if report.docker_result.success else 'var(--red)' }}">{{ 'Pass' if report.docker_result.success else 'Fail' }}</div>
+                <div class="metric-sub">{{ report.docker_result.image_tag or 'N/A' }}</div>
+            </div>
+        </div>
+
+        <!-- Violations -->
+        <div class="section">
+            <div class="section-header">🔍 Static Analysis & Vulnerabilities</div>
+            {% if report.violations %}
+            <table>
+                <thead><tr><th>Scanner</th><th>File</th><th>Line</th><th>Rule</th><th>Severity</th><th>Description</th></tr></thead>
+                <tbody>
+                {% for v in report.violations %}
+                <tr>
+                    <td><code>{{ v.scanner_name }}</code></td>
+                    <td><a href="file:///{{ v.file_path }}#L{{ v.line_number }}" class="file-link" target="_blank">{{ v.file_path.split('\\')[-1] }}</a></td>
+                    <td>{{ v.line_number }}</td>
+                    <td><code>{{ v.rule_id }}</code></td>
+                    <td><span class="badge {{ 'badge-fail' if v.severity in ['HIGH','CRITICAL'] else 'badge-warn' }}">{{ v.severity }}</span></td>
+                    <td>{{ v.description }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="empty-state">🎉 No violations detected!</p>
+            {% endif %}
+        </div>
+
+        <!-- AI Review -->
+        <div class="section">
+            <div class="section-header">🧠 AI Code Review</div>
+            <div class="review-card">
+                <p class="review-summary"><strong>Summary:</strong> {{ report.ai_review.summary }}</p>
+                {% for comment in report.ai_review.comments %}
+                <div class="comment">
+                    <div class="comment-header">
+                        <span class="badge badge-warn">{{ comment.category }}</span>
+                        <a href="file:///{{ report.target_path }}/{{ comment.file_path }}" class="file-link" target="_blank">{{ comment.file_path }}</a>
+                        <span style="color:var(--muted);font-size:0.82rem;">Line {{ comment.line_number or 'N/A' }}</span>
+                    </div>
+                    <p>{{ comment.comment }}</p>
+                    {% if comment.suggested_code %}<pre>{{ comment.suggested_code }}</pre>{% endif %}
+                </div>
+                {% endfor %}
+                {% if not report.ai_review.comments %}
+                <p class="empty-state">No specific comments from AI review.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Threat Model -->
+        {% if report.threat_model %}
+        <div class="section">
+            <div class="section-header">🛡️ STRIDE Threat Model</div>
+            <p style="color:var(--muted);font-size:0.9rem;margin-bottom:1rem;">{{ report.threat_model.summary }}</p>
+            <div class="threat-grid">
+                {% for threat in report.threat_model.threats %}
+                <div class="threat-card">
+                    <div class="threat-category">{{ threat.category }}</div>
+                    <div class="threat-title">{{ threat.threat }}</div>
+                    <div class="threat-detail"><strong>Component:</strong> {{ threat.affected_component }}</div>
+                    <div class="threat-detail" style="margin-top:0.3rem;"><strong>Mitigation:</strong> {{ threat.mitigation }}</div>
+                    <div style="margin-top:0.5rem;"><span class="badge {{ 'badge-fail' if threat.severity in ['HIGH','CRITICAL'] else 'badge-warn' }}">{{ threat.severity }}</span></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

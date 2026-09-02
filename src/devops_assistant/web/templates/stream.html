@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Running — AI DevOps Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0a0f1e; --surface:#111827; --card:#1a2236; --border:#2d3a52; --text:#e8eaf0; --muted:#8892a4; --green:#10b981; --red:#ef4444; --amber:#f59e0b; --blue:#3b82f6; --purple:#8b5cf6; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+        nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: fixed; top: 0; left: 0; right: 0; z-index: 100; }
+        .nav-brand { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .stream-container { max-width: 700px; width: 100%; margin-top: 80px; }
+        h1 { font-size: 1.5rem; text-align: center; margin-bottom: 0.5rem; }
+        .run-id { text-align: center; color: var(--muted); font-family: 'Fira Code', monospace; margin-bottom: 2rem; font-size: 0.9rem; }
+        
+        .phases { display: flex; flex-direction: column; gap: 1rem; }
+        .phase { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; transition: all 0.3s; }
+        .phase.done { border-color: var(--green); }
+        .phase.error { border-color: var(--red); }
+        .phase.running { border-color: var(--blue); box-shadow: 0 0 15px rgba(59,130,246,0.2); }
+        
+        .phase-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; background: rgba(255,255,255,0.05); flex-shrink: 0; }
+        .phase.done .phase-icon { background: rgba(16,185,129,0.2); }
+        .phase.error .phase-icon { background: rgba(239,68,68,0.2); }
+        .phase.running .phase-icon { background: rgba(59,130,246,0.2); animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        
+        .phase-info { flex: 1; }
+        .phase-name { font-weight: 600; font-size: 0.95rem; }
+        .phase-msg { color: var(--muted); font-size: 0.85rem; margin-top: 0.2rem; }
+        .phase-status { font-size: 0.8rem; font-weight: 600; }
+        .phase.done .phase-status { color: var(--green); }
+        .phase.error .phase-status { color: var(--red); }
+        .phase.running .phase-status { color: var(--blue); }
+        
+        .complete-banner { display: none; background: rgba(16,185,129,0.1); border: 1px solid var(--green); border-radius: 12px; padding: 1.5rem; text-align: center; margin-top: 1.5rem; }
+        .complete-banner h2 { color: var(--green); margin-bottom: 0.5rem; }
+        .view-btn { display: inline-block; margin-top: 1rem; background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; text-decoration: none; padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="nav-brand">🤖 AI DevOps Assistant</span>
+        <a href="/" style="color:var(--muted);text-decoration:none;font-size:0.9rem;">← Dashboard</a>
+    </nav>
+    
+    <div class="stream-container">
+        <h1>⚙️ Pipeline Running</h1>
+        <p class="run-id">Run ID: {{ run_id }}</p>
+        
+        <div class="phases" id="phases">
+            <div class="phase" id="phase-git"><div class="phase-icon">📦</div><div class="phase-info"><div class="phase-name">Git Ingestion</div><div class="phase-msg">Waiting...</div></div><div class="phase-status">PENDING</div></div>
+            <div class="phase" id="phase-scan"><div class="phase-icon">🔍</div><div class="phase-info"><div class="phase-name">Static Analysis</div><div class="phase-msg">Waiting...</div></div><div class="phase-status">PENDING</div></div>
+            <div class="phase" id="phase-tests"><div class="phase-icon">🧪</div><div class="phase-info"><div class="phase-name">Test Execution</div><div class="phase-msg">Waiting...</div></div><div class="phase-status">PENDING</div></div>
+            <div class="phase" id="phase-ai"><div class="phase-icon">🧠</div><div class="phase-info"><div class="phase-name">AI Code Review</div><div class="phase-msg">Waiting...</div></div><div class="phase-status">PENDING</div></div>
+            <div class="phase" id="phase-threat"><div class="phase-icon">🛡️</div><div class="phase-info"><div class="phase-name">Threat Modeling</div><div class="phase-msg">Waiting...</div></div><div class="phase-status">PENDING</div></div>
+            <div class="phase" id="phase-docker"><div class="phase-icon">🐳</div><div class="phase-info"><div class="phase-name">Docker Build</div><div class="phase-msg">Waiting...</div></div><div class="phase-status">PENDING</div></div>
+        </div>
+        
+        <div class="complete-banner" id="complete-banner">
+            <h2>✅ Pipeline Complete!</h2>
+            <p>Your CI report is ready.</p>
+            <a href="#" id="view-report-btn" class="view-btn">View Full Report →</a>
+        </div>
+    </div>
+
+    <script>
+        const runId = "{{ run_id }}";
+        const es = new EventSource(`/stream/events/${runId}`);
+        
+        es.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const { phase, msg, status } = data;
+            
+            if (phase === "done") {
+                es.close();
+                document.getElementById("complete-banner").style.display = "block";
+                document.getElementById("view-report-btn").href = `/report/${msg}`;
+                return;
+            }
+            if (phase === "error") {
+                es.close();
+                return;
+            }
+            
+            const el = document.getElementById(`phase-${phase}`);
+            if (!el) return;
+            
+            el.className = `phase ${status}`;
+            el.querySelector(".phase-msg").textContent = msg;
+            el.querySelector(".phase-status").textContent = status.toUpperCase();
+            
+            const icons = { done: "✅", error: "❌", running: "⏳" };
+            el.querySelector(".phase-icon").textContent = icons[status] || "⏳";
+        };
+        
+        es.onerror = () => es.close();
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+ci_reports/
+ci_reports_flask/
+ci_reports_quiz_app/
+runs.db
+.coverage
+build/
+dist/
+*.egg-info/
