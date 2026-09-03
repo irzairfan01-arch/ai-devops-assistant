@@ -17,8 +17,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from devops_assistant.web.storage import save_run, get_run, list_runs, delete_run, get_trend_data
 from devops_assistant.config import PipelineConfig
 
-app = Flask(__name__, template_folder="templates")
+# Always resolve templates from the actual source directory on disk
+_TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+app = Flask(__name__, template_folder=_TEMPLATE_DIR)
 app.secret_key = "devops-assistant-secret"
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Global SSE queue per run_id
 _sse_queues: dict[str, queue.Queue] = {}
@@ -87,6 +90,9 @@ def _run_pipeline_thread(config: PipelineConfig, run_q: queue.Queue):
 
         emit("done", report.run_id, "complete")
     except Exception as e:
+        import traceback
+        with open("C:\\Users\\irzai\\.gemini\\ai_devops_assistant\\error_log.txt", "w") as f:
+            f.write(traceback.format_exc())
         emit("error", str(e), "error")
     finally:
         run_q.put(None)  # Sentinel

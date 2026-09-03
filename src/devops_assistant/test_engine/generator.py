@@ -8,6 +8,7 @@ import httpx
 from typing import List, Optional
 from devops_assistant.config import TestRunResult
 from devops_assistant.test_engine.runner import run_pytest
+from devops_assistant.graphify import ProjectGraph
 
 
 class OllamaTestGenerator:
@@ -51,7 +52,7 @@ class OllamaTestGenerator:
             return matches[0].strip()
         return raw_response.strip()
 
-    def generate_test_file(self, source_code: str, file_path: str) -> Optional[str]:
+    def generate_test_file(self, source_code: str, file_path: str, dependency_context: str = "") -> Optional[str]:
         """Generates pytest code for a single source file."""
         prompt = f"""You are an expert Python QA automation engineer.
 Write a comprehensive pytest unit test suite for the following Python code file ({file_path}).
@@ -60,6 +61,9 @@ RULES:
 1. Return ONLY valid Python test code wrapped in ```python ... ``` block.
 2. Include docstrings and assertions testing normal cases, edge cases, and invalid inputs.
 3. Use pytest fixtures or mocks where necessary.
+
+DEPENDENCY CONTEXT (Project signatures to help you mock accurately):
+{dependency_context}
 
 SOURCE CODE:
 {source_code}
@@ -98,6 +102,8 @@ def generate_tests_for_repo(target_path: str, ollama_url: str = "http://localhos
     if not generator.is_ollama_available():
         print(f"[Info] Ollama server at {ollama_url} is unreachable. Skipping AI test generation.")
         return None
+        
+    project_graph = ProjectGraph(target_path)
 
     # Discover target Python files (excluding existing test_ files)
     py_files = []
@@ -128,7 +134,8 @@ def generate_tests_for_repo(target_path: str, ollama_url: str = "http://localhos
             test_filename = f"test_gen_{basename}"
             test_file_path = os.path.join(gen_test_dir, test_filename)
 
-            test_code = generator.generate_test_file(code_content, rel_path)
+            dep_context = project_graph.get_project_signatures(exclude_files=[rel_path])
+            test_code = generator.generate_test_file(code_content, rel_path, dependency_context=dep_context)
             if test_code:
                 with open(test_file_path, "w", encoding="utf-8") as tf:
                     tf.write(test_code)

@@ -6,22 +6,7 @@ Generates a structured security threat model from violations and code diff.
 import httpx
 import json
 from typing import List, Optional
-from pydantic import BaseModel, Field
-from devops_assistant.config import Violation
-
-
-class ThreatEntry(BaseModel):
-    category: str        # Spoofing, Tampering, Repudiation, Info Disclosure, DoS, Elevation
-    threat: str
-    affected_component: str
-    mitigation: str
-    severity: str = "MEDIUM"
-
-
-class ThreatModel(BaseModel):
-    summary: str = ""
-    threats: List[ThreatEntry] = Field(default_factory=list)
-    raw_response: str = ""
+from devops_assistant.config import Violation, ThreatModel, ThreatEntry
 
 
 _STRIDE_PROMPT = """You are a senior security architect performing a STRIDE threat model analysis.

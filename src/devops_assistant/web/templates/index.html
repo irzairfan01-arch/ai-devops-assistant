@@ -3,71 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI DevOps Assistant — Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <title>Dashboard — AutoFlow CI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0f1e; --surface: #111827; --card: #1a2236;
-            --border: #2d3a52; --text: #e8eaf0; --muted: #8892a4;
+            --bg: #070d1a; --surface: #0f1826; --card: #152032;
+            --border: #1e2d44; --text: #eef0f6; --muted: #7a88a0;
             --green: #10b981; --red: #ef4444; --amber: #f59e0b;
             --blue: #3b82f6; --purple: #8b5cf6; --cyan: #06b6d4;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-        
-        /* Navbar */
-        nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
-        .nav-brand { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .nav-links a { color: var(--muted); text-decoration: none; margin-left: 1.5rem; font-size: 0.9rem; transition: color 0.2s; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 16px;
+        }
+
+        /* ── Navbar ── */
+        nav {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 0 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+        .nav-brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            margin-left: 2.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
         .nav-links a:hover { color: var(--text); }
-        
-        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-        
-        /* Run Form */
-        .run-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 0 40px rgba(59,130,246,0.05); }
-        .run-card h2 { font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end; }
-        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
-        .form-group label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        .form-group input { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1rem; color: var(--text); font-size: 0.9rem; font-family: 'Fira Code', monospace; transition: border-color 0.2s; }
-        .form-group input:focus { outline: none; border-color: var(--blue); }
-        .btn-run { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; border: none; border-radius: 8px; padding: 0.65rem 1.8rem; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; white-space: nowrap; }
-        .btn-run:hover { opacity: 0.9; transform: translateY(-1px); }
-        
-        /* Runs Table */
-        .section-title { font-size: 1rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
-        .runs-table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        .runs-table th { background: rgba(255,255,255,0.03); color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.8rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
-        .runs-table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+
+        /* ── Layout ── */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 3rem 4rem;
+        }
+
+        /* ── Run Card ── */
+        .run-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem 3.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 0 80px rgba(59,130,246,0.08);
+        }
+        .run-card h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr 1.3fr auto;
+            gap: 1.4rem;
+            align-items: end;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 0.6rem; }
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .form-group input {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: 'Fira Code', monospace;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        .btn-run {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+        .btn-run:hover { opacity: 0.88; transform: translateY(-2px); }
+
+        /* ── Section Title ── */
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ── Table ── */
+        .runs-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .runs-table th {
+            background: rgba(255,255,255,0.025);
+            color: var(--muted);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 1.2rem 1.6rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .runs-table td {
+            padding: 1.4rem 1.6rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.97rem;
+            vertical-align: middle;
+        }
         .runs-table tr:last-child td { border-bottom: none; }
-        .runs-table tr:hover td { background: rgba(255,255,255,0.02); }
-        
-        .badge { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
-        .badge-pass { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid var(--green); }
-        .badge-fail { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid var(--red); }
-        
-        .score-high { color: var(--green); font-weight: 700; }
-        .score-mid { color: var(--amber); font-weight: 700; }
-        .score-low { color: var(--red); font-weight: 700; }
-        
-        .link-btn { color: var(--blue); text-decoration: none; font-size: 0.85rem; font-weight: 500; }
-        .link-btn:hover { text-decoration: underline; }
-        
-        .empty-state { text-align: center; padding: 4rem; color: var(--muted); }
-        .empty-state p { font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .empty-state small { font-size: 0.85rem; }
+        .runs-table tbody tr { transition: background 0.15s; }
+        .runs-table tbody tr:hover td { background: rgba(255,255,255,0.025); }
+
+        .badge {
+            padding: 0.35rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+        .badge-pass { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.4); }
+        .badge-fail { background: rgba(239,68,68,0.12); color: var(--red);   border: 1px solid rgba(239,68,68,0.4); }
+
+        .score { font-size: 1.05rem; font-weight: 700; }
+        .score-high { color: var(--green); }
+        .score-mid  { color: var(--amber); }
+        .score-low  { color: var(--red); }
+
+        .link-btn {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: opacity 0.15s;
+        }
+        .link-btn:hover { opacity: 0.75; }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 6rem 2rem;
+            color: var(--muted);
+        }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state p { font-size: 1.2rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text); }
+        .empty-state small { font-size: 0.95rem; }
     </style>
 </head>
 <body>
     <nav>
-        <span class="nav-brand">🤖 AI DevOps Assistant</span>
+        <span class="nav-brand">🚀 AutoFlow CI</span>
         <div class="nav-links">
             <a href="/">Dashboard</a>
-            <a href="/history">History & Trends</a>
+            <a href="/history">History &amp; Trends</a>
         </div>
     </nav>
+
     <div class="container">
+        <!-- Run Form -->
         <div class="run-card">
             <h2>🚀 Run New CI Pipeline</h2>
             <form method="POST" action="/run">
@@ -82,14 +228,16 @@
                     </div>
                     <div class="form-group">
                         <label>Ollama URL</label>
-                        <input type="text" name="ollama_url" value="http://localhost:11434" placeholder="http://localhost:11434">
+                        <input type="text" name="ollama_url" value="http://localhost:11434">
                     </div>
                     <button type="submit" class="btn-run">▶ Run Pipeline</button>
                 </div>
             </form>
         </div>
 
-        <p class="section-title">Recent Runs</p>
+        <!-- Recent Runs -->
+        <div class="section-title">Recent Runs</div>
+
         {% if runs %}
         <table class="runs-table">
             <thead>
@@ -107,22 +255,24 @@
             <tbody>
                 {% for run in runs %}
                 <tr>
-                    <td><code style="font-family:'Fira Code',monospace;font-size:0.85rem;color:var(--cyan)">{{ run.run_id }}</code></td>
-                    <td style="color:var(--muted);font-size:0.85rem;">{{ run.timestamp }}</td>
-                    <td style="font-size:0.82rem;color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ run.target_path }}">{{ run.target_path }}</td>
-                    <td class="{{ 'score-high' if run.quality_score >= 80 else ('score-mid' if run.quality_score >= 60 else 'score-low') }}">{{ run.quality_score }}/100</td>
-                    <td style="color:{{ 'var(--green)' if run.total_violations == 0 else 'var(--amber)' }}">{{ run.total_violations }}</td>
-                    <td style="color:var(--muted);">{{ run.coverage_percentage }}%</td>
+                    <td><code style="font-family:'Fira Code',monospace;color:var(--cyan);font-size:0.9rem;">{{ run.run_id }}</code></td>
+                    <td style="color:var(--muted);">{{ run.timestamp }}</td>
+                    <td style="color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="{{ run.target_path }}">{{ run.target_path }}</td>
+                    <td><span class="score {{ 'score-high' if run.quality_score >= 80 else ('score-mid' if run.quality_score >= 60 else 'score-low') }}">{{ run.quality_score }}/100</span></td>
+                    <td style="font-weight:700;color:{{ 'var(--green)' if run.total_violations == 0 else 'var(--amber)' }}">{{ run.total_violations }}</td>
+                    <td style="color:var(--muted);font-weight:600;">{{ run.coverage_percentage }}%</td>
                     <td><span class="badge {{ 'badge-pass' if run.overall_passed else 'badge-fail' }}">{{ 'PASSED' if run.overall_passed else 'FAILED' }}</span></td>
                     <td><a href="/report/{{ run.run_id }}" class="link-btn">View Report →</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
         {% else %}
         <div class="empty-state">
+            <div class="icon">🔍</div>
             <p>No pipeline runs yet.</p>
-            <small>Submit the form above to run your first CI pipeline.</small>
+            <small>Fill in the form above and click ▶ Run Pipeline to get started.</small>
         </div>
         {% endif %}
     </div>

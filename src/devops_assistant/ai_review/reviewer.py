@@ -7,6 +7,7 @@ import json
 import httpx
 from typing import List, Optional
 from devops_assistant.config import AIReviewResult, AIReviewComment, Violation
+from devops_assistant.graphify import ProjectGraph
 
 
 def run_ai_code_review(
@@ -58,6 +59,13 @@ def run_ai_code_review(
     if not code_context:
         return AIReviewResult(quality_score=95, summary="No source files found for review.", comments=[])
 
+    # Generate full project architecture graph
+    project_graph = ProjectGraph(target_path)
+    architecture_context = project_graph.get_project_signatures()
+    arch_block = ""
+    if architecture_context.strip():
+        arch_block = f"PROJECT ARCHITECTURE (Cross-Folder Signatures):\n{architecture_context}\n"
+
     violation_summary = ""
     if violations:
         v_lines = [f"- [{v.scanner_name}] {v.file_path}:{v.line_number} -> {v.description}" for v in violations[:5]]
@@ -65,7 +73,9 @@ def run_ai_code_review(
 
     prompt = f"""You are a Principal Software Engineer performing an automated Code Review.
 
-CODE CONTEXT:
+{arch_block}
+
+CODE CONTEXT (Files under review):
 {code_context}
 
 {violation_summary}
